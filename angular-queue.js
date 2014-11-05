@@ -140,12 +140,18 @@ angular.module('ngQueue', []).factory('$queue',
                         }
 
                         item = _this.queue.shift();
-                        _this.callback.call(_this, item);
+                        var defer = _this.callback.call(_this, item);
+                        if (defer) {
+                            defer.promise.then(function() {
+                                timeoutProm = $timeout(loopy,
+                                _this.delay);
+                            });
+                        } else {
+                            timeoutProm = $timeout(loopy,
+                                _this.delay);
 
-                        timeoutProm = $timeout(loopy,
-                            _this.delay);
-
-                        return;
+                            return;
+                        }
                     })();
                 }
             };
